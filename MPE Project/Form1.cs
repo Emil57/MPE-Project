@@ -336,12 +336,12 @@ namespace MPE_Project
             {
                 Debug.WriteLine("Validate MODE");
                 // For each file selected
-                ErrorsList.Clear(); 
                 foreach (string path in files)
                 {
                     headCheck = false;
                     mismatchValues = false;
                     whiteSpace = false;
+                    ErrorsList.Clear();
                     //-----------------------------------------------Load .CSV Files-------------------------------------------------------//
                     //var MPEws = Start(path);
                     var format = new ExcelTextFormat
