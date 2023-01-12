@@ -25,6 +25,7 @@ namespace MPE_Project
         readonly Dictionary<string, string> Database = new();
         readonly List<string> Headers = new() { "Supplier Name", "Component Type", "APN", "MPN", "Program Name", "Lot Code", "Date Code", "Test Step", "Tester Platform", "Test Program Name", "Manufacturing Flow", "Date Tested", "Lot Qty", "Yield %", "SYL" };
         bool headCheck, mismatchValues, whiteSpace = false;
+        bool arobba = true;
         //------------------------------------------------------------------------------------------------------------------------------------//
         //-----------------------------------------------------Generate Section---------------------------------------------------------------//
         readonly Dictionary<string, string> ListAddressBase = new(); //Column name & address (index) for copiable data
