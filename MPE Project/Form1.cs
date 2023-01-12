@@ -1,3 +1,4 @@
+using Microsoft.VisualBasic;
 using OfficeOpenXml;
 using OfficeOpenXml.Table;
 using System;
@@ -25,7 +26,7 @@ namespace MPE_Project
         readonly Dictionary<string, string> Database = new();
         readonly List<string> Headers = new() { "Supplier Name", "Component Type", "APN", "MPN", "Program Name", "Lot Code", "Date Code", "Test Step", "Tester Platform", "Test Program Name", "Manufacturing Flow", "Date Tested", "Lot Qty", "Yield %", "SYL" };
         bool headCheck, mismatchValues, whiteSpace = false;
-        bool arobba = true;
+        readonly List<string> ErrorsList = new();
         //------------------------------------------------------------------------------------------------------------------------------------//
         //-----------------------------------------------------Generate Section---------------------------------------------------------------//
         readonly Dictionary<string, string> ListAddressBase = new(); //Column name & address (index) for copiable data
@@ -335,6 +336,7 @@ namespace MPE_Project
             {
                 Debug.WriteLine("Validate MODE");
                 // For each file selected
+                ErrorsList.Clear(); 
                 foreach (string path in files)
                 {
                     headCheck = false;
@@ -348,7 +350,7 @@ namespace MPE_Project
                     };
                     var file = new FileInfo(path);
                     using var package = new ExcelPackage();
-                    var MPEws = package.Workbook.Worksheets.Add("Sheet1"); //var MPEws = package.Workbook.Worksheets.First();
+                    var MPEws = package.Workbook.Worksheets.Add(Path.GetFileName(path)); //var MPEws = package.Workbook.Worksheets.First();
                     var ts = TableStyles.Dark1;
                     MPEws.Cells["A1"].LoadFromText(file, format, ts, FirstRowIsHeader: false);
                     //Debug.WriteLine(MPEws);
@@ -391,12 +393,13 @@ namespace MPE_Project
                     Debug.WriteLine("4. Check White Spaces");
                     WhiteSpace(MPEws, realCol);
                     //save file, no need to close in code
+                    //MPEws.Cells["L:L"].Style.Numberformat.Format = "yyyy-mm-dd";
                     //---------------------------------------------------------------------------------------------------------------------//
                     //---------------------------------------------------Show Results------------------------------------------------------//
                     DisplayChecks(path);
                     //---------------------------------------------------------------------------------------------------------------------//
                     //----------------------------------------------------Save .CSV Files--------------------------------------------------//
-                    End(MPEws, path);
+                    //End(MPEws, path);
                     //---------------------------------------------------------------------------------------------------------------------//    
                 }
             } 
@@ -433,6 +436,7 @@ namespace MPE_Project
                     //headers wrong values
                     headCheck = true;
                     Debug.WriteLine("Error at cell: " + 1 + ","+col);
+                    ErrorsList.Add(MPEws.Cells[1, col].Address);
                 }
                 else if (col > 15)
                 {
@@ -450,13 +454,15 @@ namespace MPE_Project
                             {
                                 //headers wrong values
                                 headCheck = true;
-                                Debug.WriteLine("Error at cell: " + 1 + "," + col);
+                                //Debug.WriteLine("Error at cell: " + 1 + "," + col);
+                                ErrorsList.Add(MPEws.Cells[1, col].Address);
                             }
                             else if (col< 92 & !key.Equals(BinNumber))
                             {
                                 //headers wrong values
                                 headCheck = true;
-                                Debug.WriteLine("Error at cell: " + 1 + "," + col);
+                                //Debug.WriteLine("Error at cell: " + 1 + "," + col);
+                                ErrorsList.Add(MPEws.Cells[1, col].Address);
                             }
                             break;
                         case 1:
@@ -465,7 +471,8 @@ namespace MPE_Project
                             {
                                 //headers wrong values
                                 headCheck = true;
-                                Debug.WriteLine("Error at cell: " + 1 + "," + col);
+                                //Debug.WriteLine("Error at cell: " + 1 + "," + col);
+                                ErrorsList.Add(MPEws.Cells[1, col].Address);
                             }
                             break;
                         case 2:
@@ -474,7 +481,8 @@ namespace MPE_Project
                             {
                                 //headers wrong values
                                 headCheck = true;
-                                Debug.WriteLine("Error at cell: " + 1 + "," + col);
+                                //Debug.WriteLine("Error at cell: " + 1 + "," + col);
+                                ErrorsList.Add(MPEws.Cells[1, col].Address);
                             }
                             break;
                         case 3:
@@ -483,14 +491,15 @@ namespace MPE_Project
                             {
                                 //headers wrong values
                                 headCheck = true;
-                                Debug.WriteLine("Error at cell: " + 1 + "," + col);
+                                //Debug.WriteLine("Error at cell: " + 1 + "," + col);
+                                ErrorsList.Add(MPEws.Cells[1, col].Address);
                             }
                             break;
                     }
                 }
             }
             Debug.WriteLine("Process 1 finished!");
-            Console.WriteLine(string.Join(", ", Database.Select(pair => $"{pair.Key} => {pair.Value}")));
+            //Console.WriteLine(string.Join(", ", Database.Select(pair => $"{pair.Key} => {pair.Value}")));
         }
         private void MatchSameValues(ExcelWorksheet MPEws, byte realCol)
         {
@@ -505,7 +514,9 @@ namespace MPE_Project
                         {
                             //mismatch value
                             mismatchValues = true;
-                            Debug.WriteLine("Error at cell: " + j + "," + i);
+                            //Debug.WriteLine("Error at cell: " + MPEws.Cells[j,i].Address);
+                            ErrorsList.Add(MPEws.Cells[j, i].Address);
+
                         }
                     }
                     /*if (mismatchValues)
@@ -536,6 +547,7 @@ namespace MPE_Project
                     {
                         // white space
                         Debug.WriteLine("White Space at: " + j + i);
+                        ErrorsList.Add(MPEws.Cells[1, j].Address);
                         whiteSpace = true;
                         break;
 
@@ -571,13 +583,21 @@ namespace MPE_Project
             {
                 message = string.Concat(message, "\n", "Failed Header Names Check!");
             }
+            if (ErrorsList.Any())
+            {
+                message = string.Concat(message, "\n", "Error at Cells: ");
+                foreach (string error in ErrorsList)
+                {
+                    message = string.Concat(message, error, " ");
+                }
+            }
             MessageBox.Show(message, string.Concat("Results of ", Path.GetFileName(path)), MessageBoxButtons.OK);
         }
-        private static void End(ExcelWorksheet MPEws, string path)
+        public static void End(ExcelWorksheet MPEws, string path)
         {
             var formatOut = new ExcelOutputTextFormat
             {
-                Delimiter = ','
+                Delimiter = ',',
             };
             var file = new FileInfo(path);
             MPEws.Cells[1, 1, MPEws.Dimension.Rows, MPEws.Dimension.Columns].SaveToText(file, formatOut);
