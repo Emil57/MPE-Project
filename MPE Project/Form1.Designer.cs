@@ -244,7 +244,11 @@
             "Wk45",
             "Wk46",
             "Wk47",
-            "Wk48"});
+            "Wk48",
+            "Wk49",
+            "Wk50",
+            "Wk51",
+            "Wk52"});
             this.comboBox2.Location = new System.Drawing.Point(125, 317);
             this.comboBox2.MaxDropDownItems = 5;
             this.comboBox2.Name = "comboBox2";

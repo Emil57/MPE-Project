@@ -393,13 +393,13 @@ namespace MPE_Project
                     Debug.WriteLine("4. Check White Spaces");
                     WhiteSpace(MPEws, realCol);
                     //save file, no need to close in code
-                    //MPEws.Cells["L:L"].Style.Numberformat.Format = "yyyy-mm-dd";
+                    MPEws.Cells["L:L"].Style.Numberformat.Format = "mm-dd-yyyy";
                     //---------------------------------------------------------------------------------------------------------------------//
                     //---------------------------------------------------Show Results------------------------------------------------------//
                     DisplayChecks(path);
                     //---------------------------------------------------------------------------------------------------------------------//
                     //----------------------------------------------------Save .CSV Files--------------------------------------------------//
-                    //End(MPEws, path);
+                    End(MPEws, path);
                     //---------------------------------------------------------------------------------------------------------------------//    
                 }
             } 
@@ -410,10 +410,9 @@ namespace MPE_Project
             byte sub_col = 1;
             for (byte col = 1; col <= MPEws.Dimension.Columns; col++)
             {
-
                 string key = MPEws.Cells[1, col].Text;
                 string value = MPEws.Cells[2, col].Text;
-                if (key.Equals("Supplier Name") | key.Equals("Component Type") | key.Equals("APN") | key.Equals("MPN") | key.Equals("Program Name") | key.Equals("Date Code") | key.Equals("Test Step") | key.Equals("Tester Platform") | key.Equals("Manufacturing Flow") | key.Equals("SYL"))
+                if (key.Equals("Supplier Name") | key.Equals("Component Type") | key.Equals("APN") | key.Equals("MPN") | key.Equals("Program Name") | key.Equals("Date Code") | key.Equals("Test Step") | key.Equals("Manufacturing Flow") | key.Equals("SYL"))
                 {
                     if (!string.IsNullOrEmpty(value.ToString()))
                     {
