@@ -102,7 +102,7 @@ namespace MPE_Project
                 BinFRAddressAuto.Clear();
                 foreach (var head in baseWS.Cells["A1:CN1"])
                 {
-                    if (head.Text.Equals("Supplier Name") | head.Text.Equals("Component Type") | head.Text.Equals("APN") | head.Text.Equals("Program Name") | head.Text.Equals("Test Step") | head.Text.Equals("Tester Platform") | head.Text.Equals("Manufacturing Flow") | head.Text.Equals("SYL") )
+                    if (head.Text.Equals("Supplier Name") | head.Text.Equals("Component Type") | head.Text.Equals("APN") | head.Text.Equals("Program Name") | head.Text.Equals("Test Step") | head.Text.Equals("Manufacturing Flow") | head.Text.Equals("SYL") )
                     {
                         //To copy data
                         ListAddressBase.Add(head.Text, head.Address);
@@ -118,7 +118,7 @@ namespace MPE_Project
                         ListAddressBase.Add(head.Text, head.Address);
                         ListValueBase.Add(head.Text, baseWS.Cells[2, col].Text);
                     }
-                    if (head.Text.Equals("Lot Code") | head.Text.Equals("Test Program Name") | head.Text.Equals("Lot Qty") | head.Text.Equals("Yield %") | (head.Text.Contains("_%") & !string.IsNullOrWhiteSpace(baseWS.Cells[2, col].Text)) | head.Text.Equals("Date Tested"))
+                    if (head.Text.Equals("Lot Code") | head.Text.Equals("Test Program Name") | head.Text.Equals("Tester Platform") | head.Text.Equals("Lot Qty") | head.Text.Equals("Yield %") | (head.Text.Contains("_%") & !string.IsNullOrWhiteSpace(baseWS.Cells[2, col].Text)) | head.Text.Equals("Date Tested"))
                     {
                         //Not to copy data 
                         ListAddressBaseNon.Add(head.Text, head.Address);
@@ -138,7 +138,7 @@ namespace MPE_Project
                 ListAddressAuto.Clear(); LotsAddressAuto.Clear();
                 foreach (var head in autoWS.Cells["A1:NH1"])
                 {
-                    if(head.Text.Equals("Lot Code") | head.Text.Equals("Test Program Name") | head.Text.Equals("Date Tested") | head.Text.Equals("Lot Qty")| head.Text.Equals("Yield %"))
+                    if(head.Text.Equals("Lot Code") | head.Text.Equals("Test Program Name") | head.Text.Equals("Tester Platform") | head.Text.Equals("Date Tested") | head.Text.Equals("Lot Qty")| head.Text.Equals("Yield %"))
                     {
                         //Not to copy data 
                         ListAddressAuto.Add(head.Text, head.Address);
