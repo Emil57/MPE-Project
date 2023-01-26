@@ -9,6 +9,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>checklist_report_analysis_doctor_hospital_clipboard_checkup_reports_icon_210692.ico</ApplicationIcon>
     <IncludeSymbols>False</IncludeSymbols>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,7 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="6.1.1" />
+    <PackageReference Include="DynamicLanguageRuntime" Version="1.3.3" />
+    <PackageReference Include="EPPlus" Version="6.1.2" />
+    <PackageReference Include="IronPython" Version="3.4.0" />
   </ItemGroup>
 
 </Project>

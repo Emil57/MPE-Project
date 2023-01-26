@@ -1,4 +1,5 @@
 using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.ApplicationServices;
 using OfficeOpenXml;
 using OfficeOpenXml.Table;
 using System;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
 using System.Data.Common;
 using System.Diagnostics;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
@@ -16,6 +18,7 @@ using System.Security.Cryptography.Xml;
 using System.Security.Policy;
 using System.Windows.Forms;
 using static OfficeOpenXml.ExcelErrorValue;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace MPE_Project
 {
@@ -35,6 +38,7 @@ namespace MPE_Project
         readonly Dictionary<string, string> ListAddressAuto = new(); //Column name and address for non copiable data
         readonly Dictionary<string, string> LotsAddressAuto = new();
         readonly Dictionary<string, string> BinFRAddressAuto = new();
+        bool DateCodeFlag = false;
         //------------------------------------------------------------------------------------------------------------------------------------//
         public Form1()
         {
@@ -64,273 +68,86 @@ namespace MPE_Project
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             if (radioButton1.Checked)
             {
-                Debug.WriteLine("Generate MODE");
-                //---------------------------------------------------Load Files---------------------------------------------------------------//
-                //----------------------Create MPE File--------------------------//
-                using var mpePack = new ExcelPackage();
-                var mpeWS = mpePack.Workbook.Worksheets.Add("Sheet1");
-                mpeWS.Cells["A1"].Value = "Hello World!";
-                Debug.WriteLine("MPE File Created!");
-                //----------------------Autocounting File------------------------//
-                using var autoPack = new ExcelPackage(autoPath);
-                var autoWS = autoPack.Workbook.Worksheets[0];
-                Debug.WriteLine("Autocounting File Loaded!");
-                //----------------------.csv Format File-------------------------//
-                using var basePack = new ExcelPackage();
-                var baseWS = basePack.Workbook.Worksheets.Add("Sheet1");
-                if (File.Exists(basePath))
+                DateCodeFlag = false;
+                if(string.IsNullOrEmpty(comboBox1.Text) | string.IsNullOrEmpty(comboBox2.Text) | string.IsNullOrEmpty(comboBox3.Text))
                 {
-                    var baseFile = new FileInfo(basePath);
-                    var format = new ExcelTextFormat
-                    {
-                        Delimiter = ','
-                    };
-                    var ts = TableStyles.Dark1;
-                    baseWS.Cells["A1"].LoadFromText(baseFile, format, ts, FirstRowIsHeader: false);
-                    Debug.WriteLine("CSV File Loaded!");
+                    label11.Text = "*Load All Files to Start MPE Project*";
+                    label11.ForeColor = Color.DarkRed;
                 }
-                //----------------------------------------------------------------------------------------------------------------------------//
-                //-----------------------------------------------------First Row MPE----------------------------------------------------------//
-                baseWS.Cells["A1:CN1"].Copy(mpeWS.Cells["A1"]);
-                //----------------------------------------------------------------------------------------------------------------------------//
-                //---------------------------------------------Get Base Addresses-------------------------------------------------------------//
-                short col = 1;
-                ListAddressBase.Clear();
-                ListValueBase.Clear();
-                ListAddressBaseNon.Clear();
-                LotsAddressAuto.Clear();
-                BinFRAddressAuto.Clear();
-                foreach (var head in baseWS.Cells["A1:CN1"])
+                else if (!textBox3.Text.Contains(comboBox1.Text))
                 {
-                    if (head.Text.Equals("Supplier Name") | head.Text.Equals("Component Type") | head.Text.Equals("APN") | head.Text.Equals("Program Name") | head.Text.Equals("Test Step") | head.Text.Equals("Manufacturing Flow") | head.Text.Equals("SYL") )
-                    {
-                        //To copy data
-                        ListAddressBase.Add(head.Text, head.Address);
-                        ListValueBase.Add(head.Text, baseWS.Cells[2, col].Text);
-                    }
-                    if(head.Text.Equals("Date Code"))
-                    {
-                        ListAddressBase.Add(head.Text, head.Address);
-                        ListValueBase.Add("Date Code", string.Concat(comboBox2.Text, " ", comboBox3.Text));
-                    }
-                    if ((head.Text.Contains("_Number") | head.Text.Contains("_Name") | head.Text.Contains("_SBL")) & !string.IsNullOrWhiteSpace(baseWS.Cells[2, col].Text))
-                    {
-                        ListAddressBase.Add(head.Text, head.Address);
-                        ListValueBase.Add(head.Text, baseWS.Cells[2, col].Text);
-                    }
-                    if (head.Text.Equals("Lot Code") | head.Text.Equals("Test Program Name") | head.Text.Equals("Tester Platform") | head.Text.Equals("Lot Qty") | head.Text.Equals("Yield %") | (head.Text.Contains("_%") & !string.IsNullOrWhiteSpace(baseWS.Cells[2, col].Text)) | head.Text.Equals("Date Tested"))
-                    {
-                        //Not to copy data 
-                        ListAddressBaseNon.Add(head.Text, head.Address);
-                    }
-                    if (head.Text.Equals("MPN"))
-                    {
-                        ListAddressBase.Add(head.Text, head.Address);
-                        ListValueBase.Add(head.Text, comboBox1.Text);
-                    }
-                    col++;
+                    label11.Text = "*Format File Does Not Match with P/N*";
+                    label11.ForeColor = Color.DarkRed;
                 }
-                //----------------------------------------------------------------------------------------------------------------------------//
-                //--------------------------------------------------Filtering Autocounting----------------------------------------------------//
-                //Debug.WriteLine("Autocounting Range: " + autoWS.Dimension.Address);
-                col = 1;  short dateCodeAuto = 0, mpnAuto = 0, lotAuto = 0 ;
-                bool flag=false;
-                ListAddressAuto.Clear(); LotsAddressAuto.Clear();
-                foreach (var head in autoWS.Cells["A1:NH1"])
+                else 
                 {
-                    if(head.Text.Equals("Lot Code") | head.Text.Equals("Test Program Name") | head.Text.Equals("Tester Platform") | head.Text.Equals("Date Tested") | head.Text.Equals("Lot Qty")| head.Text.Equals("Yield %"))
+                    Debug.WriteLine("Generate MODE");
+                    //---------------------------------------------------Load Files---------------------------------------------------------------//
+                    //----------------------Create MPE File--------------------------//
+                    using var mpePack = new ExcelPackage();
+                    var mpeWS = mpePack.Workbook.Worksheets.Add("Sheet1");
+                    mpeWS.Cells["A1"].Value = "Hello World!";
+                    Debug.WriteLine("MPE File Created!");
+                    //----------------------Autocounting File------------------------//
+                    using var autoPack = new ExcelPackage(autoPath);
+                    var autoWS = autoPack.Workbook.Worksheets[0];
+                    Debug.WriteLine("Autocounting File Loaded!");
+                    //----------------------.csv Format File-------------------------//
+                    using var basePack = new ExcelPackage();
+                    var baseWS = basePack.Workbook.Worksheets.Add("Sheet1");
+                    if (File.Exists(basePath))
                     {
-                        //Not to copy data 
-                        ListAddressAuto.Add(head.Text, head.Address);
-                    }
-                    if(head.Text.Equals("Date Code"))
-                    {
-                        dateCodeAuto = col;
-                    }
-                    else if (head.Text.Equals("MPN"))
-                    {
-                        mpnAuto = col;
-                    }
-                    else if(head.Text.Equals("Lot Code"))
-                    {
-                        lotAuto= col;  
-                    }
-                    col++;
-                }
-                for (int row = 2; row <= autoWS.Dimension.Rows; row++)
-                {
-                    var mpn = autoWS.Cells[row, mpnAuto];
-                    var week = autoWS.Cells[row, dateCodeAuto];
-                    var lot = autoWS.Cells[row, lotAuto];
-                    if (string.Concat(comboBox2.Text, " ", comboBox3.Text).Equals(week.Text) & mpn.Text.Contains(comboBox1.Text))
-                    {
-                        flag = false;
-                        foreach (string key in LotsAddressAuto.Keys)
+                        var baseFile = new FileInfo(basePath);
+                        var format = new ExcelTextFormat
                         {
-                            if (key.Substring(0, key.Length - 2).Equals(lot.Text.Substring(0, lot.Text.Length - 2)))
+                            Delimiter = ','
+                        };
+                        var ts = TableStyles.Dark1;
+                        baseWS.Cells["A1"].LoadFromText(baseFile, format, ts, FirstRowIsHeader: false);
+                        Debug.WriteLine("CSV File Loaded!");
+                    }
+                    //----------------------------------------------------------------------------------------------------------------------------//
+                    //-----------------------------------------------------First Row MPE----------------------------------------------------------//
+                    baseWS.Cells["A1:CN1"].Copy(mpeWS.Cells["A1"]);
+                    //----------------------------------------------------------------------------------------------------------------------------//
+                    //---------------------------------------------Get Base Addresses-------------------------------------------------------------//
+                    GetBaseAddresses(baseWS);
+                    //----------------------------------------------------------------------------------------------------------------------------//
+                    //--------------------------------------------------Filtering Autocounting----------------------------------------------------//
+                    //Debug.WriteLine("Autocounting Range: " + autoWS.Dimension.Address);
+
+                    Autocounting(autoWS);
+                    if (DateCodeFlag)
+                    {
+                        //----------------------------------------------------------------------------------------------------------------------------//
+                        //--------------------------------------------------Filling Out MPE-----------------------------------------------------------//
+                        //---------------------------------------Copiable Data-----------------------------------------------//
+                        //Base File --> MPE File
+                        CopiableData(mpeWS);
+                        //--------------------------------Get Autocounting Non Copiable Data---------------------------------//
+                        //Auto File --> MPE File
+                        NonCopiableData(autoWS, mpeWS);
+                        //----------------------------------------------------------------------------------------------------------------------------//
+                        //-----------------------------------------------------Close Files------------------------------------------------------------//
+                        //----------------------Create MPE File--------------------------//
+                        string numb = "";
+                        foreach (char number in comboBox2.Text)
+                        {
+                            if (char.IsNumber(number))
                             {
-                                flag = true;
-                                break;
+                                numb = string.Concat(numb, number);
                             }
                         }
-                        if (!flag)
-                        {
-                            LotsAddressAuto.Add(lot.Text, lot.Address);
-                        }
+                        string path = string.Concat(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "\\", ListValueBase["Program Name"], "_", ListValueBase["MPN"], "_", ListValueBase["APN"], "_WW", numb, "-mpe-raw.csv");
+                        label11.Text = "Done!";
+                        label11.ForeColor = Color.DarkGreen;
+                        End(mpeWS, path);
+                        MessageBox.Show("MPE Report Succesfully Done!" + "\n" + "New path: " + path, "Results", MessageBoxButtons.OK);
+                        label11.Text = "Start MPE Project!";
+                        label11.ForeColor = Color.DarkGreen;
+                        //----------------------------------------------------------------------------------------------------------------------------//
                     }
                 }
-                string letterAuto = "", binNumber = "";
-                BinFRAddressAuto.Clear();
-                foreach (var cell in autoWS.Cells["A1:NH1"].Where(a => a.Text.Contains("_%")))
-                {
-                    binNumber = "";
-                    for (int i = 0; i <= cell.Text.Length - 1; i++)
-                    {
-                        if (char.IsDigit(cell.Text[i]))
-                        {
-                            binNumber = string.Concat(binNumber, cell.Text[i]);
-                        }
-                    }
-                    //Debug.WriteLine(binNumber);
-                    foreach(KeyValuePair<string, string> cell2 in ListValueBase.Where(a => a.Key.Contains("_Number")))
-                    {
-                        if (binNumber.Equals(cell2.Value))
-                        {
-                            BinFRAddressAuto.Add(cell.Text, cell.Address);
-                            break;
-                        }
-                    }
-                }
-                //----------------------------------------------------------------------------------------------------------------------------//
-                //--------------------------------------------------Filling Out MPE-----------------------------------------------------------//
-                //---------------------------------------Copiable Data-----------------------------------------------//
-                //Base File --> MPE File
-                string addressAuto, numberAuto = "";
-                foreach (KeyValuePair<string, string> hashmap in ListAddressBase)
-                {
-                    if (ListValueBase.ContainsKey(hashmap.Key))
-                    {
-                        if (hashmap.Value.Length > 2)
-                        {
-                            letterAuto = hashmap.Value.Substring(0, 2);
-                        }
-                        else
-                        {
-                            letterAuto = hashmap.Value.Substring(0, 1);
-                        }
-                        addressAuto = String.Concat(letterAuto, "2");
-                        //mpeWS.Cells[address].Value = ListValueBase[hashmap.Key];
-                        //string addresses = String.Concat(letter, "2:", letter, LotsAddressAuto.Count + 1);
-                        for (int row = 2; row <= LotsAddressAuto.Count + 1; row++)
-                        {
-                            addressAuto = String.Concat(letterAuto, row);
-                            mpeWS.Cells[addressAuto].Value = ListValueBase[hashmap.Key];
-                        }
-                    }
-                }
-                //--------------------------------Get Autocounting Non Copiable Data---------------------------------//
-                //Auto File --> MPE File
-                foreach (KeyValuePair<string, string> hashmap in ListAddressAuto.Concat(BinFRAddressAuto).Where(a => a.Key != "Lot Code"))
-                {
-                    string cutBin="", letterMPE="";
-                    short rowsBase = 2; binNumber = "";
-                    for (int i = 0; i <= hashmap.Value.Length - 1; i++)
-                    {
-                        if (char.IsDigit(hashmap.Value[i]))
-                        {
-                            letterAuto = hashmap.Value.Substring(0,i);
-                            break;
-                        }
-                    }
-                    if (hashmap.Key.Contains("Bin"))
-                    {
-                        // MPE File Address
-                        for (int i = 0; i <= hashmap.Key.Length - 1; i++)
-                        {
-                            if (char.IsDigit(hashmap.Key[i]))
-                            {
-                                binNumber = string.Concat(binNumber, hashmap.Key[i]);
-                            }
-                        }
-                        foreach (KeyValuePair<string, string> cell in ListValueBase.Where(a => a.Key.Contains("_Number")))
-                        {
-                            if (cell.Value.Contains(binNumber) & cell.Value.Length<=3)
-                            {
-                                for (int i = 0; i <= cell.Key.Length - 1; i++)
-                                {
-                                    if (!char.IsLetterOrDigit(cell.Key[i]))
-                                    {
-                                        cutBin = cell.Key.Substring(0, i);
-                                    }
-                                }
-                                foreach (char cell3 in ListAddressBaseNon[string.Concat(cutBin, "_%")])
-                                {
-                                    if (char.IsLetter(cell3))
-                                    {
-                                        letterMPE = string.Concat(letterMPE, cell3);
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {                       
-                        letterMPE = ListAddressBaseNon[hashmap.Key].Substring(0, 1);
-                    }
-                    foreach (KeyValuePair<string, string> lot in LotsAddressAuto)
-                    {
-                        for (int i = 0; i <= lot.Value.Length - 1; i++)
-                        {
-                            if (!char.IsLetter(lot.Value[i]))
-                            {
-                                numberAuto = lot.Value.Substring(i);
-                                break;
-                            }
-                        }
-                        addressAuto = String.Concat(letterAuto, numberAuto);
-                        string addressMPE = string.Concat(letterMPE, rowsBase);
-                        if (hashmap.Key.Contains("Bin"))
-                        {
-                            mpeWS.Cells[addressMPE].Value = Math.Round(Convert.ToDouble(autoWS.Cells[addressAuto].Value)*100, 2);
-                        }
-                        else
-                        {
-                            switch (hashmap.Key)
-                            {
-                                case "Yield %":
-                                    mpeWS.Cells[addressMPE].Value = Math.Round(Convert.ToDouble(autoWS.Cells[addressAuto].Value), 2);
-                                    break;
-                                case "Date Tested":
-                                    mpeWS.Cells[addressMPE].Value = autoWS.Cells[addressAuto].Value;
-                                    mpeWS.Cells[addressMPE].Style.Numberformat.Format = DateTimeFormatInfo.CurrentInfo.ShortDatePattern;
-                                    break;
-                                default:
-                                    mpeWS.Cells[addressMPE].Value = autoWS.Cells[addressAuto].Value;
-                                    break;
-                            }
-                        }
-                        rowsBase++;
-                    }   
-                }
-                letterAuto = ListAddressAuto["Lot Code"].Substring(0, 1);
-                string addresses = String.Concat(letterAuto, "2:", letterAuto, LotsAddressAuto.Count + 1);
-                mpeWS.Cells[addresses].FillList(LotsAddressAuto.Keys);
-                //----------------------------------------------------------------------------------------------------------------------------//
-                //-----------------------------------------------------Close Files------------------------------------------------------------//
-                //----------------------Create MPE File--------------------------//
-                string numb = "";
-                foreach(char number in comboBox2.Text)
-                {
-                    if (char.IsNumber(number))
-                    {
-                        numb = string.Concat(numb, number);
-                    }
-                }
-                string path = string.Concat(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "\\",ListValueBase["Program Name"],"_", ListValueBase["MPN"],"_", ListValueBase["APN"],"_WW",numb,"-mpe-raw.csv");
-                End(mpeWS, path);
-                MessageBox.Show("MPE Report Succesfully Done!"+"\n"+"New path: "+ path,"Results",MessageBoxButtons.OK);
-                //----------------------------------------------------------------------------------------------------------------------------//
             }
             else
             {
@@ -400,7 +217,7 @@ namespace MPE_Project
                     //---------------------------------------------------------------------------------------------------------------------//
                     //----------------------------------------------------Save .CSV Files--------------------------------------------------//
                     End(MPEws, path);
-                    //---------------------------------------------------------------------------------------------------------------------//    
+                    //---------------------------------------------------------------------------------------------------------------------//
                 }
             } 
         }
@@ -590,7 +407,10 @@ namespace MPE_Project
                     message = string.Concat(message, error, " ");
                 }
             }
+            label11.Text = "Done!";
             MessageBox.Show(message, string.Concat("Results of ", Path.GetFileName(path)), MessageBoxButtons.OK);
+            label11.Text = "Start MPE Project!";
+
         }
         public static void End(ExcelWorksheet MPEws, string path)
         {
@@ -679,6 +499,251 @@ namespace MPE_Project
             }
         }
 
+        private void GetBaseAddresses(ExcelWorksheet baseWS)
+        {
+            short col = 1;
+            ListAddressBase.Clear();
+            ListValueBase.Clear();
+            ListAddressBaseNon.Clear();
+            LotsAddressAuto.Clear();
+            BinFRAddressAuto.Clear();
+            foreach (var head in baseWS.Cells["A1:CN1"])
+            {
+                if (head.Text.Equals("Supplier Name") | head.Text.Equals("Component Type") | head.Text.Equals("APN") | head.Text.Equals("Program Name") | head.Text.Equals("Test Step") | head.Text.Equals("Manufacturing Flow") | head.Text.Equals("SYL"))
+                {
+                    //To copy data
+                    ListAddressBase.Add(head.Text, head.Address);
+                    ListValueBase.Add(head.Text, baseWS.Cells[2, col].Text);
+                }
+                if (head.Text.Equals("Date Code"))
+                {
+                    ListAddressBase.Add(head.Text, head.Address);
+                    ListValueBase.Add("Date Code", string.Concat(comboBox2.Text, " ", comboBox3.Text));
+                }
+                if ((head.Text.Contains("_Number") | head.Text.Contains("_Name") | head.Text.Contains("_SBL")) & !string.IsNullOrWhiteSpace(baseWS.Cells[2, col].Text))
+                {
+                    ListAddressBase.Add(head.Text, head.Address);
+                    ListValueBase.Add(head.Text, baseWS.Cells[2, col].Text);
+                }
+                if (head.Text.Equals("Lot Code") | head.Text.Equals("Test Program Name") | head.Text.Equals("Tester Platform") | head.Text.Equals("Lot Qty") | head.Text.Equals("Yield %") | (head.Text.Contains("_%") & !string.IsNullOrWhiteSpace(baseWS.Cells[2, col].Text)) | head.Text.Equals("Date Tested"))
+                {
+                    //Not to copy data 
+                    ListAddressBaseNon.Add(head.Text, head.Address);
+                }
+                if (head.Text.Equals("MPN"))
+                {
+                    ListAddressBase.Add(head.Text, head.Address);
+                    ListValueBase.Add(head.Text, comboBox1.Text);
+                }
+                col++;
+            }
+        }
+        private void Autocounting(ExcelWorksheet autoWS) 
+        {
+            short col = 1; short dateCodeAuto = 0, mpnAuto = 0, lotAuto = 0;
+            bool flag = false;
+            ListAddressAuto.Clear(); LotsAddressAuto.Clear();
+            foreach (var head in autoWS.Cells["A1:NH1"])
+            {
+                if (head.Text.Equals("Lot Code") | head.Text.Equals("Test Program Name") | head.Text.Equals("Tester Platform") | head.Text.Equals("Date Tested") | head.Text.Equals("Lot Qty") | head.Text.Equals("Yield %"))
+                {
+                    //Not to copy data 
+                    ListAddressAuto.Add(head.Text, head.Address);
+                }
+                if (head.Text.Equals("Date Code"))
+                {
+                    dateCodeAuto = col;
+                }
+                else if (head.Text.Equals("MPN"))
+                {
+                    mpnAuto = col;
+                }
+                else if (head.Text.Equals("Lot Code"))
+                {
+                    lotAuto = col;
+                }
+                col++;
+            }
+            //-----------------------------------------------Check Date Code---------------------------------------------------------//
+            foreach (var cell in autoWS.Cells[1, dateCodeAuto, autoWS.Dimension.Rows, dateCodeAuto])
+            {
+                if(cell.Text.Equals(string.Concat(comboBox2.Text, " ", comboBox3.Text)))
+                {
+                    DateCodeFlag = true;
+                    break;
+                }
+            }
+            //-----------------------------------------------------------------------------------------------------------------------//
+            if (DateCodeFlag)
+            {
+                for (int row = 2; row <= autoWS.Dimension.Rows; row++)
+                {
+                    var mpn = autoWS.Cells[row, mpnAuto];
+                    var week = autoWS.Cells[row, dateCodeAuto];
+                    var lot = autoWS.Cells[row, lotAuto];
+                    if (string.Concat(comboBox2.Text, " ", comboBox3.Text).Equals(week.Text) & mpn.Text.Contains(comboBox1.Text))
+                    {
+                        flag = false;
+                        foreach (string key in LotsAddressAuto.Keys)
+                        {
+                            if (key.Substring(0, key.Length - 2).Equals(lot.Text.Substring(0, lot.Text.Length - 2)))
+                            {
+                                flag = true;
+                                break;
+                            }
+                        }
+                        if (!flag)
+                        {
+                            LotsAddressAuto.Add(lot.Text, lot.Address);
+                        }
+                    }
+                }
+                string binNumber = "";
+                BinFRAddressAuto.Clear();
+                foreach (var cell in autoWS.Cells["A1:NH1"].Where(a => a.Text.Contains("_%")))
+                {
+                    binNumber = "";
+                    for (int i = 0; i <= cell.Text.Length - 1; i++)
+                    {
+                        if (char.IsDigit(cell.Text[i]))
+                        {
+                            binNumber = string.Concat(binNumber, cell.Text[i]);
+                        }
+                    }
+                    //Debug.WriteLine(binNumber);
+                    foreach (KeyValuePair<string, string> cell2 in ListValueBase.Where(a => a.Key.Contains("_Number")))
+                    {
+                        if (binNumber.Equals(cell2.Value))
+                        {
+                            BinFRAddressAuto.Add(cell.Text, cell.Address);
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                label11.Text = "Date Code does not exist in Autocounting File. Try it again." + "\n Issue with: " + string.Concat(comboBox2.Text, " ", comboBox3.Text);
+            }
+        }
+        private void CopiableData(ExcelWorksheet mpeWS)
+        {
+            string addressAuto, letterAuto = "";
+            foreach (KeyValuePair<string, string> hashmap in ListAddressBase)
+            {
+                if (ListValueBase.ContainsKey(hashmap.Key))
+                {
+                    if (hashmap.Value.Length > 2)
+                    {
+                        letterAuto = hashmap.Value.Substring(0, 2);
+                    }
+                    else
+                    {
+                        letterAuto = hashmap.Value.Substring(0, 1);
+                    }
+                    addressAuto = String.Concat(letterAuto, "2");
+                    //mpeWS.Cells[address].Value = ListValueBase[hashmap.Key];
+                    //string addresses = String.Concat(letter, "2:", letter, LotsAddressAuto.Count + 1);
+                    for (int row = 2; row <= LotsAddressAuto.Count + 1; row++)
+                    {
+                        addressAuto = String.Concat(letterAuto, row);
+                        mpeWS.Cells[addressAuto].Value = ListValueBase[hashmap.Key];
+                    }
+                }
+            }
+        }
+        private void NonCopiableData(ExcelWorksheet autoWS, ExcelWorksheet mpeWS)
+        {
+            string letterAuto = "", numberAuto="", addressAuto;
+            foreach (KeyValuePair<string, string> hashmap in ListAddressAuto.Concat(BinFRAddressAuto).Where(a => a.Key != "Lot Code"))
+            {
+                string cutBin = "", letterMPE = "", binNumber = "";
+                short rowsBase = 2; 
+                for (int i = 0; i <= hashmap.Value.Length - 1; i++)
+                {
+                    if (char.IsDigit(hashmap.Value[i]))
+                    {
+                        letterAuto = hashmap.Value.Substring(0, i);
+                        break;
+                    }
+                }
+                if (hashmap.Key.Contains("Bin"))
+                {
+                    // MPE File Address
+                    for (int i = 0; i <= hashmap.Key.Length - 1; i++)
+                    {
+                        if (char.IsDigit(hashmap.Key[i]))
+                        {
+                            binNumber = string.Concat(binNumber, hashmap.Key[i]);
+                        }
+                    }
+                    foreach (KeyValuePair<string, string> cell in ListValueBase.Where(a => a.Key.Contains("_Number")))
+                    {
+                        if (cell.Value.Contains(binNumber) & cell.Value.Length <= 3)
+                        {
+                            for (int i = 0; i <= cell.Key.Length - 1; i++)
+                            {
+                                if (!char.IsLetterOrDigit(cell.Key[i]))
+                                {
+                                    cutBin = cell.Key.Substring(0, i);
+                                }
+                            }
+                            foreach (char cell3 in ListAddressBaseNon[string.Concat(cutBin, "_%")])
+                            {
+                                if (char.IsLetter(cell3))
+                                {
+                                    letterMPE = string.Concat(letterMPE, cell3);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    letterMPE = ListAddressBaseNon[hashmap.Key].Substring(0, 1);
+                }
+                foreach (KeyValuePair<string, string> lot in LotsAddressAuto)
+                {
+                    for (int i = 0; i <= lot.Value.Length - 1; i++)
+                    {
+                        if (!char.IsLetter(lot.Value[i]))
+                        {
+                            numberAuto = lot.Value.Substring(i);
+                            break;
+                        }
+                    }
+                    addressAuto = String.Concat(letterAuto, numberAuto);
+                    string addressMPE = string.Concat(letterMPE, rowsBase);
+                    if (hashmap.Key.Contains("Bin"))
+                    {
+                        mpeWS.Cells[addressMPE].Value = Math.Round(Convert.ToDouble(autoWS.Cells[addressAuto].Value) * 100, 2);
+                    }
+                    else
+                    {
+                        switch (hashmap.Key)
+                        {
+                            case "Yield %":
+                                mpeWS.Cells[addressMPE].Value = Math.Round(Convert.ToDouble(autoWS.Cells[addressAuto].Value), 2);
+                                break;
+                            case "Date Tested":
+                                mpeWS.Cells[addressMPE].Value = autoWS.Cells[addressAuto].Value;
+                                mpeWS.Cells[addressMPE].Style.Numberformat.Format = DateTimeFormatInfo.CurrentInfo.ShortDatePattern;
+                                break;
+                            default:
+                                mpeWS.Cells[addressMPE].Value = autoWS.Cells[addressAuto].Value;
+                                break;
+                        }
+                    }
+                    rowsBase++;
+                }
+            }
+            letterAuto = ListAddressAuto["Lot Code"].Substring(0, 1);
+            string addresses = String.Concat(letterAuto, "2:", letterAuto, LotsAddressAuto.Count + 1);
+            mpeWS.Cells[addresses].FillList(LotsAddressAuto.Keys);
+        }
+
+        //-----------------------------------------------------Extras Section----------------------------------------------------------------//
         private void ProgressBar(int percentage)
         {
             progressBar1.Value=percentage;

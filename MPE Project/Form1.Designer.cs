@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
@@ -52,6 +53,11 @@
             this.label10 = new System.Windows.Forms.Label();
             this.comboBox3 = new System.Windows.Forms.ComboBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.label11 = new System.Windows.Forms.Label();
+            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
+            this.button5 = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -279,20 +285,20 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point);
-            this.label8.Location = new System.Drawing.Point(8, 368);
+            this.label8.Font = new System.Drawing.Font("Segoe UI Semibold", 7.8F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point);
+            this.label8.Location = new System.Drawing.Point(11, 403);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(159, 38);
+            this.label8.Size = new System.Drawing.Size(151, 34);
             this.label8.TabIndex = 23;
             this.label8.Text = "By: Dimas Emiliano, \r\nPDSE Department, 2022";
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point);
-            this.label9.Location = new System.Drawing.Point(510, 385);
+            this.label9.Font = new System.Drawing.Font("Segoe UI Semibold", 7.8F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point);
+            this.label9.Location = new System.Drawing.Point(489, 422);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(153, 19);
+            this.label9.Size = new System.Drawing.Size(147, 17);
             this.label9.TabIndex = 24;
             this.label9.Text = "Skyworks Solutions Inc.";
             // 
@@ -322,7 +328,7 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(198, 365);
+            this.progressBar1.Location = new System.Drawing.Point(192, 406);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(284, 31);
             this.progressBar1.Step = 0;
@@ -330,12 +336,36 @@
             this.progressBar1.TabIndex = 27;
             this.progressBar1.Visible = false;
             // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.label11.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label11.ForeColor = System.Drawing.Color.DarkGreen;
+            this.label11.Location = new System.Drawing.Point(21, 361);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(133, 20);
+            this.label11.TabIndex = 28;
+            this.label11.Text = "Start MPE Project!";
+            // 
+            // button5
+            // 
+            this.button5.Font = new System.Drawing.Font("Calibri", 19.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.button5.Location = new System.Drawing.Point(530, 88);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(80, 55);
+            this.button5.TabIndex = 29;
+            this.button5.Text = "GO";
+            this.button5.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(669, 409);
+            this.ClientSize = new System.Drawing.Size(659, 451);
+            this.Controls.Add(this.button5);
+            this.Controls.Add(this.label11);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.comboBox3);
@@ -362,6 +392,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "MPE Project";
+            ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -392,5 +423,9 @@
         private Label label10;
         private ComboBox comboBox3;
         private ProgressBar progressBar1;
+        private Label label11;
+        private ColorDialog colorDialog1;
+        private BindingSource bindingSource1;
+        private Button button5;
     }
 }
