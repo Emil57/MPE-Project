@@ -1,24 +1,7 @@
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.ApplicationServices;
 using OfficeOpenXml;
 using OfficeOpenXml.Table;
-using System;
-using System.Buffers.Text;
-using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
-using System.Data.Common;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Security.Cryptography.Xml;
-using System.Security.Policy;
-using System.Windows.Forms;
-using static OfficeOpenXml.ExcelErrorValue;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace MPE_Project
 {
@@ -172,7 +155,7 @@ namespace MPE_Project
                     MPEws.Cells["A1"].LoadFromText(file, format, ts, FirstRowIsHeader: false);
                     //Debug.WriteLine(MPEws);
                     Debug.WriteLine("CSV File Loaded");
-                    //MPEws.Cells["A10"].Value = "Hola";
+                    MPEws.Cells["A2:CN2"].Copy(MPEws.Cells["A2"]);
                     //Debug.WriteLine(MPEws.Cells["A10"].Value);
                     //---------------------------------------------------------------------------------------------------------------------//
                     //--------------------------------------------------Validate Head Rows-------------------------------------------------//
