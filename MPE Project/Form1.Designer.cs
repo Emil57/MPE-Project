@@ -181,7 +181,10 @@
             // 
             // comboBox1
             // 
+            this.comboBox1.DropDownHeight = 85;
+            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.IntegralHeight = false;
             this.comboBox1.Items.AddRange(new object[] {
             "SKY53882-26",
             "SKY53883-19",
@@ -223,8 +226,34 @@
             // 
             // comboBox2
             // 
+            this.comboBox2.DropDownHeight = 85;
+            this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox2.FormattingEnabled = true;
+            this.comboBox2.IntegralHeight = false;
             this.comboBox2.Items.AddRange(new object[] {
+            "Wk01",
+            "Wk02",
+            "Wk03",
+            "Wk04",
+            "Wk05",
+            "Wk06",
+            "Wk07",
+            "Wk08",
+            "Wk09",
+            "Wk10",
+            "Wk11",
+            "Wk12",
+            "Wk13",
+            "Wk14",
+            "Wk15",
+            "Wk16",
+            "Wk17",
+            "Wk18",
+            "Wk19",
+            "Wk20",
+            "Wk21",
+            "Wk22",
+            "Wk23",
             "Wk24",
             "Wk25",
             "Wk26",
@@ -314,7 +343,10 @@
             // 
             // comboBox3
             // 
+            this.comboBox3.DropDownHeight = 85;
+            this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox3.FormattingEnabled = true;
+            this.comboBox3.IntegralHeight = false;
             this.comboBox3.Items.AddRange(new object[] {
             "FY2022",
             "FY2023",
@@ -364,17 +396,15 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(659, 451);
+            this.Controls.Add(this.comboBox2);
             this.Controls.Add(this.button5);
-            this.Controls.Add(this.label11);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.comboBox3);
             this.Controls.Add(this.label9);
-            this.Controls.Add(this.label8);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.label7);
-            this.Controls.Add(this.comboBox2);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.label5);
@@ -389,6 +419,8 @@
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.label11);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "MPE Project";

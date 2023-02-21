@@ -1,6 +1,7 @@
 using OfficeOpenXml;
 using OfficeOpenXml.Table;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 
 namespace MPE_Project
@@ -74,6 +75,8 @@ namespace MPE_Project
                     //----------------------Autocounting File------------------------//
                     using var autoPack = new ExcelPackage(autoPath);
                     var autoWS = autoPack.Workbook.Worksheets[0];
+                    autoWS.Cells["L:L"].Style.Numberformat.Format = "mm/dd/yyyy";
+                    autoPack.SaveAs(autoPath);
                     Debug.WriteLine("Autocounting File Loaded!");
                     //----------------------.csv Format File-------------------------//
                     using var basePack = new ExcelPackage();
@@ -155,7 +158,6 @@ namespace MPE_Project
                     MPEws.Cells["A1"].LoadFromText(file, format, ts, FirstRowIsHeader: false);
                     //Debug.WriteLine(MPEws);
                     Debug.WriteLine("CSV File Loaded");
-                    MPEws.Cells["A2:CN2"].Copy(MPEws.Cells["A2"]);
                     //Debug.WriteLine(MPEws.Cells["A10"].Value);
                     //---------------------------------------------------------------------------------------------------------------------//
                     //--------------------------------------------------Validate Head Rows-------------------------------------------------//
@@ -193,7 +195,7 @@ namespace MPE_Project
                     Debug.WriteLine("4. Check White Spaces");
                     WhiteSpace(MPEws, realCol);
                     //save file, no need to close in code
-                    MPEws.Cells["L:L"].Style.Numberformat.Format = "mm-dd-yyyy";
+                    MPEws.Cells["L:L"].Style.Numberformat.Format = "mm/dd/yyyy";
                     //---------------------------------------------------------------------------------------------------------------------//
                     //---------------------------------------------------Show Results------------------------------------------------------//
                     DisplayChecks(path);
