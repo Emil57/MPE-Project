@@ -56,7 +56,6 @@
             this.label11 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
-            this.button5 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -197,7 +196,13 @@
             "SKY58290-20",
             "SKY58296-20",
             "SKY59724-16",
-            "SKY55422-14"});
+            "SKY55422-14",
+            "SKY53904-11",
+            "SKY53903-13",
+            "SKY55210-16",
+            "SKY58440-11",
+            "SKY58446-11",
+            "SKY59724-17"});
             this.comboBox1.Location = new System.Drawing.Point(125, 284);
             this.comboBox1.MaxDropDownItems = 5;
             this.comboBox1.Name = "comboBox1";
@@ -380,16 +385,6 @@
             this.label11.TabIndex = 28;
             this.label11.Text = "Start MPE Project!";
             // 
-            // button5
-            // 
-            this.button5.Font = new System.Drawing.Font("Calibri", 19.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.button5.Location = new System.Drawing.Point(530, 88);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(80, 55);
-            this.button5.TabIndex = 29;
-            this.button5.Text = "GO";
-            this.button5.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             this.AllowDrop = true;
@@ -397,7 +392,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(659, 451);
             this.Controls.Add(this.comboBox2);
-            this.Controls.Add(this.button5);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.comboBox3);
@@ -458,6 +452,5 @@
         private Label label11;
         private ColorDialog colorDialog1;
         private BindingSource bindingSource1;
-        private Button button5;
     }
 }

@@ -101,7 +101,6 @@ namespace MPE_Project
                     //----------------------------------------------------------------------------------------------------------------------------//
                     //--------------------------------------------------Filtering Autocounting----------------------------------------------------//
                     //Debug.WriteLine("Autocounting Range: " + autoWS.Dimension.Address);
-
                     Autocounting(autoWS);
                     if (DateCodeFlag)
                     {
@@ -403,6 +402,11 @@ namespace MPE_Project
             {
                 Delimiter = ',',
             };
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+
+            }
             var file = new FileInfo(path);
             MPEws.Cells[1, 1, MPEws.Dimension.Rows, MPEws.Dimension.Columns].SaveToText(file, formatOut);
             Debug.WriteLine("File " + Path.GetFileName(path) + " Closed!");
@@ -631,8 +635,26 @@ namespace MPE_Project
                     //string addresses = String.Concat(letter, "2:", letter, LotsAddressAuto.Count + 1);
                     for (int row = 2; row <= LotsAddressAuto.Count + 1; row++)
                     {
+                        //convert SBL value to percentage with no symbol if required
                         addressAuto = String.Concat(letterAuto, row);
-                        mpeWS.Cells[addressAuto].Value = ListValueBase[hashmap.Key];
+                        if (hashmap.Key.Contains("SBL"))
+                        {
+                            double notationSBL = Convert.ToDouble(ListValueBase[hashmap.Key]);
+                            if (notationSBL < 0.01) 
+                            {
+                                mpeWS.Cells[addressAuto].Value = Math.Round(notationSBL*100,2);
+                            }
+                            else
+                            {
+                            mpeWS.Cells[addressAuto].Value = ListValueBase[hashmap.Key];
+                            }
+                        }
+                        else
+                        {
+                            mpeWS.Cells[addressAuto].Value = ListValueBase[hashmap.Key];
+                        }
+                        
+
                     }
                 }
             }
