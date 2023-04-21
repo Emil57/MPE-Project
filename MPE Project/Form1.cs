@@ -195,6 +195,8 @@ namespace MPE_Project
                     WhiteSpace(MPEws, realCol);
                     //save file, no need to close in code
                     MPEws.Cells["L:L"].Style.Numberformat.Format = "mm/dd/yyyy";
+                    MPEws.Cells[MPEws.Dimension.Rows, 1,1048575,realCol].Delete(eShiftTypeDelete.Up); //delete non used spaces
+                    //Debug.WriteLine(MPEws.Dimension.Rows);
                     //---------------------------------------------------------------------------------------------------------------------//
                     //---------------------------------------------------Show Results------------------------------------------------------//
                     DisplayChecks(path);
@@ -405,7 +407,6 @@ namespace MPE_Project
             if (File.Exists(path))
             {
                 File.Delete(path);
-
             }
             var file = new FileInfo(path);
             MPEws.Cells[1, 1, MPEws.Dimension.Rows, MPEws.Dimension.Columns].SaveToText(file, formatOut);
