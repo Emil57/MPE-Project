@@ -1,3 +1,4 @@
+using Microsoft.Scripting.Actions.Calls;
 using OfficeOpenXml;
 using OfficeOpenXml.Table;
 using System.Diagnostics;
@@ -12,8 +13,10 @@ namespace MPE_Project
         readonly List<string> files = new();
         readonly Dictionary<string, string> Database = new();
         readonly List<string> Headers = new() { "Supplier Name", "Component Type", "APN", "MPN", "Program Name", "Lot Code", "Date Code", "Test Step", "Tester Platform", "Test Program Name", "Manufacturing Flow", "Date Tested", "Lot Qty", "Yield %", "SYL" };
-        bool headCheck, mismatchValues, whiteSpace = false;
+        bool headCheck, mismatchValues, whiteSpace = false; // flags for validation section
         readonly List<string> ErrorsList = new();
+        readonly List<string> SBLTriggeredAddresses = new();
+        readonly List<string> SYLTriggeredAddresses = new();
         //------------------------------------------------------------------------------------------------------------------------------------//
         //-----------------------------------------------------Generate Section---------------------------------------------------------------//
         readonly Dictionary<string, string> ListAddressBase = new(); //Column name & address (index) for copiable data
@@ -198,6 +201,36 @@ namespace MPE_Project
                     MPEws.Cells[MPEws.Dimension.Rows, 1,1048575,realCol].Delete(eShiftTypeDelete.Up); //delete non used spaces
                     //Debug.WriteLine(MPEws.Dimension.Rows);
                     //---------------------------------------------------------------------------------------------------------------------//
+                    //---------------------------------------------Check if FR% triggers SBL-----------------------------------------------//
+                    Debug.WriteLine("5. Check if FR% triggers SBL");
+                    SBLTriggeredAddresses.Clear();
+                    SYLTriggeredAddresses.Clear();
+                    for (int col=1; col<=realCol; col++)
+                    {
+                        var FindColumnFR = MPEws.Cells[1,col];
+                        if (FindColumnFR.Text.EndsWith("_%"))
+                        {
+                            var SBLTrigger = Convert.ToDouble(MPEws.Cells[2, col + 1].Value);
+                            for (int row=2; row <= MPEws.Dimension.Rows; row++)
+                            {
+                                var LotFailureRate = Convert.ToDouble(MPEws.Cells[row, col].Value);
+                                if (LotFailureRate >= SBLTrigger)
+                                {
+                                    SBLTriggeredAddresses.Add(MPEws.Cells[row, col].Address.ToString());
+                                }
+                            }
+                        }
+                    }
+                    // Same for SYL and Yield
+                    for (int row = 2; row<=MPEws.Dimension.Rows; row++)
+                    {
+                        var yield = Convert.ToDouble(MPEws.Cells[row, 14].Value);
+                        var syl = Convert.ToDouble(MPEws.Cells[2, 15].Value);
+                        if (yield <= syl)
+                        {
+                            SYLTriggeredAddresses.Add(MPEws.Cells[row, 14].Address.ToString());
+                        }
+                    }
                     //---------------------------------------------------Show Results------------------------------------------------------//
                     DisplayChecks(path);
                     //---------------------------------------------------------------------------------------------------------------------//
@@ -352,7 +385,6 @@ namespace MPE_Project
                         ErrorsList.Add(MPEws.Cells[1, j].Address);
                         whiteSpace = true;
                         break;
-
                     }
                 }
             }
@@ -389,6 +421,22 @@ namespace MPE_Project
             {
                 message = string.Concat(message, "\n", "Error at Cells: ");
                 foreach (string error in ErrorsList)
+                {
+                    message = string.Concat(message, error, " ");
+                }
+            }
+            if (SBLTriggeredAddresses.Any())
+            {
+                message = string.Concat(message, "\n", "SBL is Triggered at Cells: ");
+                foreach (string error in SBLTriggeredAddresses)
+                {
+                    message = string.Concat(message, error, " ");
+                }
+            }
+            if (SYLTriggeredAddresses.Any())
+            {
+                message = string.Concat(message, "\n", "SYL is Triggered at Cells: ");
+                foreach (string error in SYLTriggeredAddresses)
                 {
                     message = string.Concat(message, error, " ");
                 }
