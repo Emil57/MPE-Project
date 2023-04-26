@@ -143,10 +143,10 @@ namespace MPE_Project
                 // For each file selected
                 foreach (string path in files)
                 {
-                    headCheck = false;
-                    mismatchValues = false;
-                    whiteSpace = false;
+                    headCheck = false; mismatchValues = false; whiteSpace = false;
                     ErrorsList.Clear();
+                    SBLTriggeredAddresses.Clear();
+                    SYLTriggeredAddresses.Clear();
                     //-----------------------------------------------Load .CSV Files-------------------------------------------------------//
                     //var MPEws = Start(path);
                     var format = new ExcelTextFormat
@@ -171,7 +171,7 @@ namespace MPE_Project
                     Debug.WriteLine("Columns: " + Convert.ToString(MPEws.Dimension.Columns));
                     Debug.WriteLine("Rows: " + Convert.ToString(MPEws.Dimension.Rows - 1));
                     byte realCol = 0;
-                    for (short a = 2; a <= MPEws.Dimension.Rows - 1; a++)
+                    /*for (short a = 2; a <= MPEws.Dimension.Rows - 1; a++)
                     {
                         byte fake = 0;
                         foreach (var cell in MPEws.Cells[string.Concat("A", Convert.ToString(a), ":", "CN", Convert.ToString(a))])
@@ -186,6 +186,14 @@ namespace MPE_Project
                             }
                             fake++;
                         }
+                    }*/
+                    foreach (var cell in MPEws.Cells["A2:CN2"])
+                    {
+                        if (string.IsNullOrEmpty(cell.Text))
+                        {
+                            break;
+                        }
+                        realCol++;
                     }
                     Debug.WriteLine("Real Columns: " + realCol);
                     //---------------------------------------------------------------------------------------------------------------------//
@@ -198,13 +206,11 @@ namespace MPE_Project
                     WhiteSpace(MPEws, realCol);
                     //save file, no need to close in code
                     MPEws.Cells["L:L"].Style.Numberformat.Format = "mm/dd/yyyy";
-                    MPEws.Cells[MPEws.Dimension.Rows, 1,1048575,realCol].Delete(eShiftTypeDelete.Up); //delete non used spaces
+                    MPEws.Cells[MPEws.Dimension.Rows+1, 1,1048575,realCol].Delete(eShiftTypeDelete.Up); //delete non used spaces
                     //Debug.WriteLine(MPEws.Dimension.Rows);
                     //---------------------------------------------------------------------------------------------------------------------//
                     //---------------------------------------------Check if FR% triggers SBL-----------------------------------------------//
-                    Debug.WriteLine("5. Check if FR% triggers SBL");
-                    SBLTriggeredAddresses.Clear();
-                    SYLTriggeredAddresses.Clear();
+                    Debug.WriteLine("5. Check if FR% triggers SBL/SYL");
                     for (int col=1; col<=realCol; col++)
                     {
                         var FindColumnFR = MPEws.Cells[1,col];
@@ -222,7 +228,7 @@ namespace MPE_Project
                         }
                     }
                     // Same for SYL and Yield
-                    for (int row = 2; row<=MPEws.Dimension.Rows; row++)
+                    for (int row = 2; row<MPEws.Dimension.Rows; row++)
                     {
                         var yield = Convert.ToDouble(MPEws.Cells[row, 14].Value);
                         var syl = Convert.ToDouble(MPEws.Cells[2, 15].Value);
@@ -244,7 +250,7 @@ namespace MPE_Project
         {  
             Database.Clear();
             byte sub_col = 1;
-            for (byte col = 1; col <= MPEws.Dimension.Columns; col++)
+            for (byte col = 1; col < MPEws.Dimension.Columns; col++)
             {
                 string key = MPEws.Cells[1, col].Text;
                 string value = MPEws.Cells[2, col].Text;
@@ -342,7 +348,7 @@ namespace MPE_Project
             {
                 if (Database.ContainsKey(MPEws.Cells[1, i].Text) | MPEws.Cells[1, i].Text.Equals(""))
                 {
-                    for (int j = 2; j <= MPEws.Dimension.Rows - 1; j++)
+                    for (int j = 2; j <MPEws.Dimension.Rows; j++)
                     {
                         var cell = MPEws.Cells[j, i].Text;
                         if (!Database.ContainsValue(cell.ToString()))
@@ -375,7 +381,7 @@ namespace MPE_Project
         {
             for (byte i = 1; i <= realCol; i++)
             {
-                for (short j=1; j<=MPEws.Dimension.Rows-1; j++)
+                for (short j=1; j<MPEws.Dimension.Rows; j++)
                 {
                     var cell = MPEws.Cells[j, i].Text;
                     if (string.IsNullOrEmpty(cell))
@@ -444,7 +450,6 @@ namespace MPE_Project
             label11.Text = "Done!";
             MessageBox.Show(message, string.Concat("Results of ", Path.GetFileName(path)), MessageBoxButtons.OK);
             label11.Text = "Start MPE Project!";
-
         }
         public static void End(ExcelWorksheet MPEws, string path)
         {
